@@ -4,10 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { createOrder, clearOrderError } from "../features/order/orderSlice";
 import { fetchCart } from "../features/cart/cartSlice";
 import { useNavigate, Link } from "react-router-dom";
-import {
-  startStripeCheckout,
-  confirmStripeOrder,
-} from "../features/payment/paymentSlice";
+import { startStripeCheckout } from "../features/payment/paymentSlice";
 import { clearPaymentErrors } from "../features/payment/paymentSlice";
 
 const CheckoutPage = () => {
@@ -87,6 +84,34 @@ const CheckoutPage = () => {
   //     console.error("Order failed:", err);
   //   }
   // };
+  // const handlePlaceOrder = async (e) => {
+  //   e.preventDefault();
+  //   dispatch(clearOrderError());
+  //   dispatch(clearPaymentErrors());
+
+  //   if (!address.street || !address.city || !address.pincode) {
+  //     alert("Please fill street, city and pincode");
+  //     return;
+  //   }
+
+  //   try {
+  //     if (paymentMethod === "COD") {
+  //       await dispatch(
+  //         createOrder({
+  //           deliveryAddress: address,
+  //           paymentMethod: "COD",
+  //         })
+  //       ).unwrap();
+  //       // success navigate handled by useEffect
+  //     } else if (paymentMethod === "STRIPE") {
+  //       // Start Stripe checkout – this will redirect away from site
+  //       await dispatch(startStripeCheckout()).unwrap();
+  //       // after this, user goes to Stripe page
+  //     }
+  //   } catch (err) {
+  //     console.error("Order/payment failed:", err);
+  //   }
+  // };
   const handlePlaceOrder = async (e) => {
     e.preventDefault();
     dispatch(clearOrderError());
@@ -105,11 +130,12 @@ const CheckoutPage = () => {
             paymentMethod: "COD",
           })
         ).unwrap();
-        // success navigate handled by useEffect
       } else if (paymentMethod === "STRIPE") {
-        // Start Stripe checkout – this will redirect away from site
-        await dispatch(startStripeCheckout()).unwrap();
-        // after this, user goes to Stripe page
+        // 👇 address send pannrom
+        await dispatch(
+          startStripeCheckout({ deliveryAddress: address })
+        ).unwrap();
+        // redirect will happen automatically (Stripe URL)
       }
     } catch (err) {
       console.error("Order/payment failed:", err);
