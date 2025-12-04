@@ -17,6 +17,7 @@ import MyOrdersPage from "./pages/MyOrdersPage";
 import AdminRoute from "./components/layout/AdminRoute";
 import AdminOrdersPage from "./pages/Admin/AdminOrdersPage";
 import OrderTrackingPage from "./pages/OrderTrackingPage";
+import PaymentSuccessPage from "./pages/PaymentSuccessPage";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -103,6 +104,14 @@ const App = () => {
             element={
               <ProtectedRoute>
                 <OrderTrackingPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/payment-success"
+            element={
+              <ProtectedRoute>
+                <PaymentSuccessPage />
               </ProtectedRoute>
             }
           />

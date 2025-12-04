@@ -4,10 +4,18 @@ import { useDispatch, useSelector } from "react-redux";
 import { createOrder, clearOrderError } from "../features/order/orderSlice";
 import { fetchCart } from "../features/cart/cartSlice";
 import { useNavigate, Link } from "react-router-dom";
+import {
+  startStripeCheckout,
+  confirmStripeOrder,
+} from "../features/payment/paymentSlice";
+import { clearPaymentErrors } from "../features/payment/paymentSlice";
 
 const CheckoutPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const { stripeLoading, stripeError, confirmLoading, confirmError } =
+    useSelector((state) => state.payment);
 
   const { cart, loading: cartLoading } = useSelector((state) => state.cart);
   const { creating, createError, lastCreatedOrder } = useSelector(
@@ -57,26 +65,54 @@ const CheckoutPage = () => {
     setAddress((prev) => ({ ...prev, [name]: value }));
   };
 
+  // const handlePlaceOrder = async (e) => {
+  //   e.preventDefault();
+  //   dispatch(clearOrderError());
+
+  //   // minimal validation
+  //   if (!address.street || !address.city || !address.pincode) {
+  //     alert("Please fill street, city and pincode");
+  //     return;
+  //   }
+
+  //   try {
+  //     await dispatch(
+  //       createOrder({
+  //         deliveryAddress: address,
+  //         paymentMethod,
+  //       })
+  //     ).unwrap();
+  //     // success handled by useEffect (navigate)
+  //   } catch (err) {
+  //     console.error("Order failed:", err);
+  //   }
+  // };
   const handlePlaceOrder = async (e) => {
     e.preventDefault();
     dispatch(clearOrderError());
+    dispatch(clearPaymentErrors());
 
-    // minimal validation
     if (!address.street || !address.city || !address.pincode) {
       alert("Please fill street, city and pincode");
       return;
     }
 
     try {
-      await dispatch(
-        createOrder({
-          deliveryAddress: address,
-          paymentMethod,
-        })
-      ).unwrap();
-      // success handled by useEffect (navigate)
+      if (paymentMethod === "COD") {
+        await dispatch(
+          createOrder({
+            deliveryAddress: address,
+            paymentMethod: "COD",
+          })
+        ).unwrap();
+        // success navigate handled by useEffect
+      } else if (paymentMethod === "STRIPE") {
+        // Start Stripe checkout – this will redirect away from site
+        await dispatch(startStripeCheckout()).unwrap();
+        // after this, user goes to Stripe page
+      }
     } catch (err) {
-      console.error("Order failed:", err);
+      console.error("Order/payment failed:", err);
     }
   };
 
@@ -194,15 +230,37 @@ const CheckoutPage = () => {
               />
               <span>Cash on Delivery</span>
             </label>
-            {/* later online payment options add panna mudiyum */}
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="radio"
+                name="paymentMethod"
+                value="STRIPE"
+                checked={paymentMethod === "STRIPE"}
+                onChange={() => setPaymentMethod("STRIPE")}
+              />
+              <span>Pay with Card (Stripe)</span>
+            </label>
           </div>
 
-          <button
+          {/* <button
             type="submit"
             disabled={creating}
             className="mt-3 w-full bg-red-500 text-white py-2 rounded text-sm hover:bg-red-600 disabled:opacity-60"
           >
             {creating ? "Placing order..." : `Place Order (₹${totalToPay})`}
+          </button> */}
+          <button
+            type="submit"
+            disabled={creating || stripeLoading}
+            className="mt-3 w-full bg-red-500 text-white py-2 rounded text-sm hover:bg-red-600 disabled:opacity-60"
+          >
+            {paymentMethod === "COD"
+              ? creating
+                ? "Placing order..."
+                : `Place Order (₹${totalToPay})`
+              : stripeLoading
+              ? "Redirecting to Stripe..."
+              : `Pay with Stripe (₹${totalToPay})`}
           </button>
         </form>
       </div>
