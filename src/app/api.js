@@ -1,8 +1,8 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://tomato-5fkk.onrender.com", // backend URL
-  withCredentials: true, // important for sessions (cookies)
-});
+  baseURL: "http://16.171.148.112:5000/", // backend URL
+  withCredentials: true, //cookies
+})
 
 export default api;
