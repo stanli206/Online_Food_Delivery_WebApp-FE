@@ -1,7 +1,7 @@
 export const loginWithGoogle = () => {
-  const backendUrl ="https://tomato-5fkk.onrender.com";
+  const backendUrl = "https://d2z2es90bhnbzx.cloudfront.net"; 
 
   window.location.href = `${backendUrl}/api/auth/google`;
 };
 
-// import.meta.env.VITE_BACKEND_URL ||http://localhost:5001
+
