@@ -16,7 +16,7 @@ const Navbar = () => {
     <nav className="bg-white shadow-sm">
       <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
         <Link to="/" className="font-bold text-xl text-red-500">
-          🍅Tomato 
+          🍅🍅Tomato 
         </Link>
 
         <div className="flex items-center gap-4">
