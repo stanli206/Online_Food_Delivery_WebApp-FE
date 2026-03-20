@@ -21,13 +21,13 @@ import PaymentSuccessPage from "./pages/PaymentSuccessPage";
 
 const App = () => {
   const dispatch = useDispatch();
-  const { initialized, loading } = useSelector((state) => state.auth);
+  const { initialized } = useSelector((state) => state.auth);
 
   useEffect(() => {
     dispatch(fetchCurrentUser());
   }, [dispatch]);
 
-  if (!initialized && loading) {
+  if (!initialized) {
     return (
       <div className="h-screen flex items-center justify-center">
         <p className="text-lg">Loading...</p>
