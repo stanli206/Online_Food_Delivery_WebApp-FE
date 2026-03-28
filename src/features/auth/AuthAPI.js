@@ -1,5 +1,4 @@
 export const loginWithGoogle = () => {
-  const backendUrl = "https://d2z2es90bhnbzx.cloudfront.net";
-
+  const backendUrl = import.meta.env.VITE_BACKEND_URL; 
   window.location.href = `${backendUrl}/api/auth/google`;
 };

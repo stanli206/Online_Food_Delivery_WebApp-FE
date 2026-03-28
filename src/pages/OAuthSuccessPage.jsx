@@ -1,25 +1,25 @@
-// src/pages/OAuthSuccessPage.jsx
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { fetchCurrentUser } from "../features/auth/authSlice";
 import { useNavigate } from "react-router-dom";
+import { loginSuccess } from "../features/auth/authSlice";
 
 const OAuthSuccessPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const init = async () => {
-      const resultAction = await dispatch(fetchCurrentUser());
-      // success or fail both la, just go home or login
-      if (fetchCurrentUser.fulfilled.match(resultAction)) {
-        navigate("/", { replace: true });
-      } else {
-        navigate("/login", { replace: true });
-      }
-    };
-    init();
-  }, [dispatch, navigate]);
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get("token");
+
+    if (token) {
+      localStorage.setItem("token", token);
+
+      dispatch(loginSuccess(token));
+      navigate("/", { replace: true });
+    } else {
+      navigate("/login", { replace: true });
+    }
+  }, []);
 
   return (
     <div className="h-[70vh] flex flex-col items-center justify-center">
