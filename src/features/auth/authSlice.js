@@ -18,7 +18,7 @@ export const registerUser = createAsyncThunk(
         err.response?.data?.message || "Registration failed. Please try again.";
       return rejectWithValue(message);
     }
-  }
+  },
 );
 
 // Login
@@ -31,10 +31,11 @@ export const loginUser = createAsyncThunk(
       return res.data.user;
     } catch (err) {
       const message =
-        err.response?.data?.message || "Login failed. Please check credentials.";
+        err.response?.data?.message ||
+        "Login failed. Please check credentials.";
       return rejectWithValue(message);
     }
-  }
+  },
 );
 
 // Logout
@@ -50,42 +51,38 @@ export const logoutUser = createAsyncThunk(
         err.response?.data?.message || "Logout failed. Please try again.";
       return rejectWithValue(message);
     }
-  }
+  },
 );
-
 
 export const fetchCurrentUser = createAsyncThunk(
   "auth/fetchCurrentUser",
   async (_, { rejectWithValue }) => {
     try {
-      
       const token = localStorage.getItem("token");
       if (!token) return rejectWithValue(null);
 
       const res = await api.get("/api/auth/me");
       return res.data.user;
     } catch (err) {
-      
       localStorage.removeItem("token");
       return rejectWithValue(null);
     }
-  }
+  },
 );
 
 export const handleOAuthSuccess = createAsyncThunk(
   "auth/handleOAuthSuccess",
   async (token, { rejectWithValue }) => {
     try {
-      
       localStorage.setItem("token", token);
-      
+
       const res = await api.get("/api/auth/me");
       return res.data.user;
     } catch (err) {
       localStorage.removeItem("token");
       return rejectWithValue("OAuth login failed");
     }
-  }
+  },
 );
 
 const initialState = {
@@ -105,7 +102,6 @@ const authSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    
     builder
       .addCase(registerUser.pending, (state) => {
         state.loading = true;
@@ -122,7 +118,6 @@ const authSlice = createSlice({
         state.error = action.payload || "Registration failed";
       });
 
-  
     builder
       .addCase(loginUser.pending, (state) => {
         state.loading = true;
@@ -141,7 +136,6 @@ const authSlice = createSlice({
         state.user = null;
       });
 
-    
     builder
       .addCase(logoutUser.pending, (state) => {
         state.loading = true;
@@ -157,7 +151,6 @@ const authSlice = createSlice({
         state.error = action.payload || "Logout failed";
       });
 
-    
     builder
       .addCase(fetchCurrentUser.pending, (state) => {
         state.loading = true;
@@ -197,5 +190,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { clearAuthError } = authSlice.actions;
+export const { loginSuccess, clearAuthError } = authSlice.actions;
 export default authSlice.reducer;
