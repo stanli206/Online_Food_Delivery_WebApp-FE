@@ -1,8 +1,7 @@
-// src/features/auth/authSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../app/api";
 
-// Thunks
+// Register
 export const registerUser = createAsyncThunk(
   "auth/registerUser",
   async ({ name, email, password }, { rejectWithValue }) => {
@@ -12,55 +11,78 @@ export const registerUser = createAsyncThunk(
         email,
         password,
       });
+      localStorage.setItem("token", res.data.token);
       return res.data.user;
     } catch (err) {
       const message =
         err.response?.data?.message || "Registration failed. Please try again.";
       return rejectWithValue(message);
     }
-  }
+  },
 );
 
+// Login
 export const loginUser = createAsyncThunk(
   "auth/loginUser",
   async ({ email, password }, { rejectWithValue }) => {
     try {
       const res = await api.post("/api/auth/login", { email, password });
+      localStorage.setItem("token", res.data.token);
       return res.data.user;
     } catch (err) {
       const message =
-        err.response?.data?.message || "Login failed. Please check credentials.";
+        err.response?.data?.message ||
+        "Login failed. Please check credentials.";
       return rejectWithValue(message);
     }
-  }
+  },
 );
 
+// Logout
 export const logoutUser = createAsyncThunk(
   "auth/logoutUser",
   async (_, { rejectWithValue }) => {
     try {
       await api.post("/api/auth/logout");
+      localStorage.removeItem("token");
       return true;
     } catch (err) {
       const message =
         err.response?.data?.message || "Logout failed. Please try again.";
       return rejectWithValue(message);
     }
-  }
+  },
 );
 
-// Session restore / check
 export const fetchCurrentUser = createAsyncThunk(
   "auth/fetchCurrentUser",
   async (_, { rejectWithValue }) => {
     try {
+      const token = localStorage.getItem("token");
+      if (!token) return rejectWithValue(null);
+
       const res = await api.get("/api/auth/me");
       return res.data.user;
     } catch (err) {
-      // 401 means not logged in - not a big error
+      localStorage.removeItem("token");
       return rejectWithValue(null);
     }
-  }
+  },
+);
+
+export const handleOAuthSuccess = createAsyncThunk(
+  "auth/handleOAuthSuccess",
+  async (token, { rejectWithValue }) => {
+    try {
+      localStorage.setItem("token", token);
+
+      const res = await api.get("/api/auth/me");
+      return res.data.user;
+    } catch (err) {
+      localStorage.removeItem("token");
+      return rejectWithValue("OAuth login failed");
+    }
+  },
 );
 
 const initialState = {
@@ -68,20 +90,24 @@ const initialState = {
   loading: false,
   error: null,
   isAuthenticated: false,
-  initialized: false, // to know if we already tried session restore
+  initialized: false,
 };
 
 const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    // For manual clear error on UI
     clearAuthError(state) {
       state.error = null;
     },
+    loginSuccess(state, action) {
+      state.loading = false;
+      state.user = action.payload;
+      state.isAuthenticated = true;
+      state.initialized = true;
+    },
   },
   extraReducers: (builder) => {
-    // REGISTER
     builder
       .addCase(registerUser.pending, (state) => {
         state.loading = true;
@@ -91,13 +117,13 @@ const authSlice = createSlice({
         state.loading = false;
         state.user = action.payload;
         state.isAuthenticated = true;
+        state.initialized = true;
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Registration failed";
       });
 
-    // LOGIN
     builder
       .addCase(loginUser.pending, (state) => {
         state.loading = true;
@@ -107,6 +133,7 @@ const authSlice = createSlice({
         state.loading = false;
         state.user = action.payload;
         state.isAuthenticated = true;
+        state.initialized = true;
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
@@ -115,7 +142,6 @@ const authSlice = createSlice({
         state.user = null;
       });
 
-    // LOGOUT
     builder
       .addCase(logoutUser.pending, (state) => {
         state.loading = true;
@@ -124,13 +150,13 @@ const authSlice = createSlice({
         state.loading = false;
         state.user = null;
         state.isAuthenticated = false;
+        state.initialized = true;
       })
       .addCase(logoutUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Logout failed";
       });
 
-    // FETCH CURRENT USER (session restore)
     builder
       .addCase(fetchCurrentUser.pending, (state) => {
         state.loading = true;
@@ -148,8 +174,27 @@ const authSlice = createSlice({
         state.isAuthenticated = false;
         state.initialized = true;
       });
+
+    // GOOGLE OAUTH SUCCESS
+    builder
+      .addCase(handleOAuthSuccess.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(handleOAuthSuccess.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload;
+        state.isAuthenticated = true;
+        state.initialized = true;
+      })
+      .addCase(handleOAuthSuccess.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "OAuth failed";
+        state.isAuthenticated = false;
+        state.initialized = true;
+      });
   },
 });
 
-export const { clearAuthError } = authSlice.actions;
+export const { clearAuthError, loginSuccess } = authSlice.actions;
 export default authSlice.reducer;
