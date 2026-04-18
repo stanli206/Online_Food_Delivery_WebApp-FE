@@ -1,4 +1,3 @@
-// src/pages/RestaurantDetailPage.jsx
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -14,13 +13,21 @@ const RestaurantDetailPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { selectedRestaurant, detailLoading, detailError, menuItems, menuLoading, menuError } =
-    useSelector((state) => state.restaurant);
+  const {
+    selectedRestaurant,
+    detailLoading,
+    detailError,
+    menuItems,
+    menuLoading,
+    menuError,
+  } = useSelector((state) => state.restaurant);
 
   const { isAuthenticated } = useSelector((state) => state.auth);
-  const { loading: cartLoading, error: cartError, isAuthIssue } = useSelector(
-    (state) => state.cart
-  );
+  const {
+    loading: cartLoading,
+    error: cartError,
+    isAuthIssue,
+  } = useSelector((state) => state.cart);
 
   const [addingItemId, setAddingItemId] = useState(null);
 
@@ -30,8 +37,11 @@ const RestaurantDetailPage = () => {
   }, [dispatch, id]);
 
   const handleAddToCart = (itemId) => {
+    console.log(itemId);
     if (!isAuthenticated) {
-      navigate("/login", { state: { from: { pathname: `/restaurants/${id}` } } });
+      navigate("/login", {
+        state: { from: { pathname: `/restaurants/${id}` } },
+      });
       return;
     }
 
@@ -41,7 +51,7 @@ const RestaurantDetailPage = () => {
         restaurantId: id,
         menuItemId: itemId,
         quantity: 1,
-      })
+      }),
     ).finally(() => {
       setAddingItemId(null);
     });
@@ -82,26 +92,27 @@ const RestaurantDetailPage = () => {
         )}
       </div>
 
-      {cartError && (
-        <p className="text-xs text-red-600 mb-2">{cartError}</p>
-      )}
+      {cartError && <p className="text-xs text-red-600 mb-2">{cartError}</p>}
       {isAuthIssue && (
         <p className="text-xs text-red-500 mb-2">
-          Please <Link to="/login" className="underline">login</Link> to add items to cart.
+          Please{" "}
+          <Link to="/login" className="underline">
+            login
+          </Link>{" "}
+          to add items to cart.
         </p>
       )}
 
       <h2 className="text-lg font-semibold mb-2">Menu</h2>
       {menuLoading && <p>Loading menu...</p>}
-      {menuError && (
-        <p className="text-sm text-red-600 mb-2">{menuError}</p>
-      )}
+      {menuError && <p className="text-sm text-red-600 mb-2">{menuError}</p>}
 
       <div>
         {menuItems.map((item) => (
           <MenuItemCard
             key={item._id}
             item={item}
+            restaurantId={id}
             onAddToCart={() => handleAddToCart(item._id)}
             adding={cartLoading && addingItemId === item._id}
           />

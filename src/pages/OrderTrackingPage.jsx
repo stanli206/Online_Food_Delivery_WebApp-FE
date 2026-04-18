@@ -74,7 +74,7 @@ const OrderTrackingPage = () => {
         </div>
       </div>
 
-      {/* Timeline */}
+      
       <div className="bg-white rounded-xl shadow p-4 mb-4">
         <h2 className="text-sm font-semibold mb-3">Delivery Status</h2>
 
@@ -85,7 +85,6 @@ const OrderTrackingPage = () => {
           </div>
         ) : (
           <div className="relative">
-            {/* vertical line */}
             <div className="absolute left-[10px] top-0 bottom-0 w-[2px] bg-gray-200" />
 
             <div className="space-y-4">
@@ -95,7 +94,6 @@ const OrderTrackingPage = () => {
 
                 return (
                   <div key={step.key} className="flex items-start gap-3">
-                    {/* dot */}
                     <div className="relative z-10">
                       <div
                         className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
@@ -132,7 +130,6 @@ const OrderTrackingPage = () => {
         )}
       </div>
 
-      {/* Items + address */}
       <div className="grid md:grid-cols-2 gap-4">
         <div className="bg-white rounded-xl shadow p-4">
           <h2 className="text-sm font-semibold mb-2">Items</h2>

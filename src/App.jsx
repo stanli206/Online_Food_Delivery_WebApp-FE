@@ -18,6 +18,7 @@ import AdminRoute from "./components/layout/AdminRoute";
 import AdminOrdersPage from "./pages/Admin/AdminOrdersPage";
 import OrderTrackingPage from "./pages/OrderTrackingPage";
 import PaymentSuccessPage from "./pages/PaymentSuccessPage";
+import PaymentFailedPage from "./pages/PaymentFailedPage";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -73,6 +74,8 @@ const App = () => {
             }
           />
 
+          <Route path="/payment-success" element={<PaymentSuccessPage />} />
+          <Route path="/payment-failed" element={<PaymentFailedPage />} />
           <Route
             path="/orders"
             element={

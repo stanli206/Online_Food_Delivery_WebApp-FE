@@ -1,4 +1,3 @@
-// src/pages/MyOrdersPage.jsx
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchMyOrders } from "../features/order/orderSlice";
@@ -85,10 +84,6 @@ const MyOrdersPage = () => {
                 </Link>
               </div>
 
-              {/* <div className="text-right text-xs text-gray-600 flex flex-col justify-between">
-                <p>Payment: {order.paymentInfo?.method}</p>
-                <p>Status: {order.paymentInfo?.status}</p>
-              </div> */}
             </div>
           );
         })}
