@@ -10,8 +10,8 @@ import { clearPaymentErrors } from "../features/payment/paymentSlice";
 const CheckoutPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  const { stripeLoading, stripeError, confirmLoading, confirmError } =
+// , stripeError, confirmLoading, confirmError
+  const { stripeLoading } =
     useSelector((state) => state.payment);
 
   const { cart, loading: cartLoading } = useSelector((state) => state.cart);
@@ -31,7 +31,7 @@ const CheckoutPage = () => {
 
   const [paymentMethod, setPaymentMethod] = useState("COD");
 
-  // Ensure user is logged in & cart loaded
+  
   useEffect(() => {
     if (!isAuthenticated) {
       navigate("/login", { state: { from: { pathname: "/checkout" } } });
@@ -40,17 +40,15 @@ const CheckoutPage = () => {
     dispatch(fetchCart());
   }, [dispatch, isAuthenticated, navigate]);
 
-  // If cart empty → redirect to /cart
   useEffect(() => {
     if (!cartLoading && (!cart || !cart.items || cart.items.length === 0)) {
-      // Only run after initial fetch
+
       if (!cartLoading) {
         navigate("/cart");
       }
     }
   }, [cart, cartLoading, navigate]);
 
-  // If order created successfully → go to success page
   useEffect(() => {
     if (lastCreatedOrder && lastCreatedOrder._id) {
       navigate(`/order-success/${lastCreatedOrder._id}`, { replace: true });
@@ -62,85 +60,33 @@ const CheckoutPage = () => {
     setAddress((prev) => ({ ...prev, [name]: value }));
   };
 
-  // const handlePlaceOrder = async (e) => {
-  //   e.preventDefault();
-  //   dispatch(clearOrderError());
 
-  //   // minimal validation
-  //   if (!address.street || !address.city || !address.pincode) {
-  //     alert("Please fill street, city and pincode");
-  //     return;
-  //   }
-
-  //   try {
-  //     await dispatch(
-  //       createOrder({
-  //         deliveryAddress: address,
-  //         paymentMethod,
-  //       })
-  //     ).unwrap();
-  //     // success handled by useEffect (navigate)
-  //   } catch (err) {
-  //     console.error("Order failed:", err);
-  //   }
-  // };
-  // const handlePlaceOrder = async (e) => {
-  //   e.preventDefault();
-  //   dispatch(clearOrderError());
-  //   dispatch(clearPaymentErrors());
-
-  //   if (!address.street || !address.city || !address.pincode) {
-  //     alert("Please fill street, city and pincode");
-  //     return;
-  //   }
-
-  //   try {
-  //     if (paymentMethod === "COD") {
-  //       await dispatch(
-  //         createOrder({
-  //           deliveryAddress: address,
-  //           paymentMethod: "COD",
-  //         })
-  //       ).unwrap();
-  //       // success navigate handled by useEffect
-  //     } else if (paymentMethod === "STRIPE") {
-  //       // Start Stripe checkout – this will redirect away from site
-  //       await dispatch(startStripeCheckout()).unwrap();
-  //       // after this, user goes to Stripe page
-  //     }
-  //   } catch (err) {
-  //     console.error("Order/payment failed:", err);
-  //   }
-  // };
   const handlePlaceOrder = async (e) => {
-    e.preventDefault();
-    dispatch(clearOrderError());
-    dispatch(clearPaymentErrors());
+  e.preventDefault();
+  dispatch(clearOrderError());
+  dispatch(clearPaymentErrors());
 
-    if (!address.street || !address.city || !address.pincode) {
-      alert("Please fill street, city and pincode");
-      return;
-    }
+  if (!address.street || !address.city || !address.pincode) {
+    alert("Please fill street, city and pincode");
+    return;
+  }
 
-    try {
-      if (paymentMethod === "COD") {
-        await dispatch(
-          createOrder({
-            deliveryAddress: address,
-            paymentMethod: "COD",
-          })
-        ).unwrap();
-      } else if (paymentMethod === "STRIPE") {
-        // 👇 address send pannrom
-        await dispatch(
-          startStripeCheckout({ deliveryAddress: address })
-        ).unwrap();
-        // redirect will happen automatically (Stripe URL)
-      }
-    } catch (err) {
-      console.error("Order/payment failed:", err);
+  try {
+    if (paymentMethod === "COD") {
+      await dispatch(
+        createOrder({
+          deliveryAddress: address,
+          paymentMethod: "COD",
+        })
+      ).unwrap();
+    } else if (paymentMethod === "STRIPE") {
+      
+      await dispatch(startStripeCheckout()).unwrap();
     }
-  };
+  } catch (err) {
+    console.error(err);
+  }
+};
 
   if (cartLoading) {
     return <p className="mt-4">Loading checkout...</p>;
@@ -159,11 +105,11 @@ const CheckoutPage = () => {
     );
   }
 
-  const totalToPay = cart.subtotal + 30; // same as CartPage
+  const totalToPay = cart.subtotal + 30; 
 
   return (
     <div className="mt-4 grid md:grid-cols-[2fr,1fr] gap-4">
-      {/* Address form */}
+      
       <div className="bg-white rounded-xl shadow p-4">
         <h1 className="text-lg font-semibold mb-3">Delivery Address</h1>
 
@@ -268,13 +214,7 @@ const CheckoutPage = () => {
             </label>
           </div>
 
-          {/* <button
-            type="submit"
-            disabled={creating}
-            className="mt-3 w-full bg-red-500 text-white py-2 rounded text-sm hover:bg-red-600 disabled:opacity-60"
-          >
-            {creating ? "Placing order..." : `Place Order (₹${totalToPay})`}
-          </button> */}
+         
           <button
             type="submit"
             disabled={creating || stripeLoading}
@@ -291,7 +231,7 @@ const CheckoutPage = () => {
         </form>
       </div>
 
-      {/* Order summary (read from cart) */}
+      
       <div className="bg-white rounded-xl shadow p-4">
         <h2 className="font-semibold mb-3 text-sm">Order Summary</h2>
         <div className="space-y-2 max-h-64 overflow-y-auto">

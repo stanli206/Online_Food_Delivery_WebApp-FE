@@ -65,6 +65,8 @@ export const fetchCurrentUser = createAsyncThunk(
       return res.data.user;
     } catch (err) {
       localStorage.removeItem("token");
+      err.response?.data?.message || "Logout failed. Please try again.";
+
       return rejectWithValue(null);
     }
   },

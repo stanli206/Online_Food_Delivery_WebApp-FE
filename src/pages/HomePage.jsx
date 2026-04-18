@@ -1,4 +1,3 @@
-// src/pages/HomePage.jsx
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
@@ -45,7 +44,7 @@ const HomePage = () => {
         )}
       </div>
 
-      {/* Later inga Restaurant list, filters, etc. add pannalam */}
+      
       <div className="grid gap-4 md:grid-cols-3">
         <div className="bg-white rounded-lg shadow p-4">
           <h2 className="font-semibold mb-1 text-gray-800">Fast Delivery 🚀</h2>

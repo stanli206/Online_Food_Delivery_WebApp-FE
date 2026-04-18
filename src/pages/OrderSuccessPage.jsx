@@ -1,4 +1,3 @@
-// src/pages/OrderSuccessPage.jsx
 import React, { useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
@@ -9,7 +8,6 @@ const OrderSuccessPage = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
 
-  // ensure cart is refreshed (should be empty now)
   useEffect(() => {
     dispatch(fetchCart());
     dispatch(clearLastCreatedOrder());

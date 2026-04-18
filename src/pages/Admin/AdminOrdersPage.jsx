@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   fetchAllOrdersAdmin,
   updateOrderStatusAdmin,
-  clearOrderError,
 } from "../../features/order/orderSlice";
 
 const statusOptions = [
@@ -119,7 +118,7 @@ const AdminOrdersPage = () => {
                   <span className="text-xs text-gray-500">#{shortId}</span>
                   <span
                     className={`text-[11px] px-2 py-0.5 rounded-full ${statusColor(
-                      order.status
+                      order.status,
                     )}`}
                   >
                     {order.status}
@@ -143,8 +142,7 @@ const AdminOrdersPage = () => {
                 <p>{order.deliveryAddress?.label}</p>
                 <p>{order.deliveryAddress?.street}</p>
                 <p>
-                  {order.deliveryAddress?.city}{" "}
-                  {order.deliveryAddress?.pincode}
+                  {order.deliveryAddress?.city} {order.deliveryAddress?.pincode}
                 </p>
                 <p>{order.deliveryAddress?.landmark}</p>
               </div>
